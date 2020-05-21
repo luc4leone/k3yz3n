@@ -1,19 +1,23 @@
-var data = {};
-var hits_correct = 0;
-var hits_wrong = 0;
-var start_time = 0;
-var hpm = 0;
-var ratio = 0;
 
+var data = {};
 data.chars = " jfkdlsahgyturieowpqbnvmcxz6758493021`-=[]\\;',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|:\"<>?";
 data.consecutive = 5;
 data.word_length = 7;
 data.current_layout = "qwerty";
-layouts={};
+
+var hits_correct = 0;
+var hits_wrong = 0;
+var start_time = 0;
+/* not sure what it means */
+var hpm = 0;
+/* not sure what ratio refers to */
+var ratio = 0;
+
+
+var layouts = {};
 layouts["qwerty"] = " jfkdlsahgyturieowpqbnvmcxz6758493021`-=[]\\;',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|:\"<>?";
 layouts["azerty"] = " jfkdlsmqhgyturieozpabnvcxw6758493021`-=[]\\;',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|:\"<>?";
 layouts["colemak"] = " ntesiroahdjglpufywqbkvmcxz1234567890'\",.!?:;/@$%&#*()_ABCDEFGHIJKLMNOPQRSTUVWXYZ~+-={}|^<>`[]\\";
-layouts["bépo"] = " tesirunamc,èvodpléjbk'.qxghyfàzw6758493021`-=[]\\;/ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|:\"<>?";
 layouts["norman"] = " ntieosaygjkufrdlw;qbpvmcxz1234567890'\",.!?:;/@$%&#*()_ABCDEFGHIJKLMNOPQRSTUVWXYZ~+-={}|^<>`[]\\";
 layouts["code-es6"] = " {}',;():.>=</_-|`!?#[]\\+\"@$%&*~^";
 
@@ -28,7 +32,7 @@ $(document).ready(function() {
     $(document).keypress(keyHandler);
 });
 
-
+/* TODO */
 function start_stats() {
     start_time = start_time || Math.floor(new Date().getTime() / 1000);
 }
@@ -45,7 +49,6 @@ function update_stats() {
         if (!isFinite(hpm)) { hpm = 0; }
     }
 }
-
 
 function set_level(l) {
     data.in_a_row = {};
@@ -76,7 +79,6 @@ function set_layout(l) {
     save();
     render();
 }
-
 
 function keyHandler(e) {
     start_stats();
@@ -126,7 +128,6 @@ function next_word(){
     save();
 }
 
-
 function level_up() {
     if (data.level + 1 <= data.chars.length - 1) {
         (new Audio('ding.wav')).play();
@@ -135,16 +136,15 @@ function level_up() {
     set_level(l);
 }
 
-
+/* TODO */
 function save() {
     localStorage.data = JSON.stringify(data);
 }
 
-
+/* TODO */
 function load() {
     data = JSON.parse(localStorage.data);
 }
-
 
 function render() {
     render_layout();
@@ -217,7 +217,6 @@ function inc_rigor() {
     render_rigor();
 }
 
-
 function render_level_bar() {
     training_chars = get_training_chars();
     if(training_chars.length == 0) {
@@ -281,7 +280,6 @@ function render_word() {
     $("#word").html(word + "<br>" + keys_hit);
 }
 
-
 function generate_word() {
     word = '';
     for(var i = 0; i < data.word_length; i++) {
@@ -296,7 +294,7 @@ function generate_word() {
     return word;
 }
 
-
+/* TODO */
 function get_level_chars() {
     return data.chars.slice(0, data.level + 1).split('');
 }
@@ -312,6 +310,7 @@ function get_training_chars() {
     return training_chars;
 }
 
+/* TODO */
 function choose(a) {
     return a[Math.floor(Math.random() * a.length)];
 }
