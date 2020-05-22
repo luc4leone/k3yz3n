@@ -5,15 +5,9 @@ data.consecutive = 5;
 data.word_length = 7;
 data.current_layout = "qwerty";
 
-var hits_correct = 0;
-var hits_wrong = 0;
-var start_time = 0;
-/* not sure what it means */
-var hpm = 0;
-/* not sure what ratio refers to */
-var ratio = 0;
 
 
+/* cos'è un layout, sembra una stringa e basta, ma non mi è chiara l associazione con la ui, è l'ordine con cui devo padroneggiare le lettere? */
 var layouts = {};
 layouts["qwerty"] = " jfkdlsahgyturieowpqbnvmcxz6758493021`-=[]\\;',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|:\"<>?";
 layouts["azerty"] = " jfkdlsmqhgyturieozpabnvcxw6758493021`-=[]\\;',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|:\"<>?";
@@ -33,21 +27,37 @@ $(document).ready(function() {
 });
 
 /* TODO */
+var start_time = 0;
+/* - viene chiamata in keyHandler, on keypress
+   - div.stats
+*/
 function start_stats() {
+    /* 
+      quando start_time è 0, assegna il tempo in sec
+      quando start_time è > 0, assegna
+     */
     start_time = start_time || Math.floor(new Date().getTime() / 1000);
 }
 
+/* TODO */
+var hpm = 0; /* hits per minute */
+var ratio = 0;
+var hits_correct = 0;
+var hits_wrong = 0;
 function update_stats() {
-    if (start_time) {
-        var current_time = (Math.floor(new Date().getTime() / 1000));
-        ratio = Math.floor(
-            hits_correct / (hits_correct + hits_wrong) * 100
-        );
-        hpm = Math.floor(
-            (hits_correct + hits_wrong) / (current_time - start_time) * 60
-        );
-        if (!isFinite(hpm)) { hpm = 0; }
+  if (start_time) {
+    var current_time = (Math.floor(new Date().getTime() / 1000));
+    /* better than "ration": correct hits %, see also render_stats(), the author knows it! */
+    ratio = Math.floor(hits_correct / (hits_correct + hits_wrong) * 100);
+    /* total hits per minute */
+    hpm = Math.floor((hits_correct + hits_wrong) / (current_time - start_time) * 60);
+    /* 
+      built-in function that "returns false if the argument is positive or negative Infinity or NaN or undefined; otherwise, true."
+     */
+    if (!isFinite(hpm)) {
+      hpm = 0;
     }
+  }
 }
 
 function set_level(l) {
