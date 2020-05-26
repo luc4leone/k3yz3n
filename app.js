@@ -1,8 +1,58 @@
+/* 
+some references:
+  https://www.typingtest.com/
+  https://first20hours.com/typing/
+  https://code.google.com/archive/p/amphetype/
+  https://colemak.com/
+  https://www.keybr.com/profile
+  https://www.typing.com/student/lesson/328/common-english-words
+  https://www.speedtypingonline.com/typing-tutor
+
+  https://www.computerhope.com/issues/ch001346.htm
+  https://comp.editors.narkive.com/UFCzZ2RJ/touch-typing-for-programmers
+
+  How to Calculate Typing Speed (WPM) and Accuracy
+  https://www.speedtypingonline.com/typing-equations
+
+  keyboard finger position
+  https://www.computerhope.com/issues/ch001346.htm
+ */
+
+ /* 
+  PLAN OF ATTACK
+  Functions to make sense of
+  [x] start_stats
+  [x] update_stats
+  [ ] set_level
+  [ ] set_layout
+  [ ] keyHandler
+  [ ] next_word
+  [ ] level_up
+  [x] save
+  [x] load
+  [ ] render
+  [ ] render_layout
+  [ ] render_level
+  [ ] render_rigor
+  [ ] render_stats
+  [ ] inc_rigor
+  [ ] render_level_bar
+  [ ] render_word
+  [ ] generate_word
+  [x] get_level_chars
+  [ ] get_training_chars
+  [x] choose
+
+
+
+
+
+  */
 
 var data = {};
 data.chars = " jfkdlsahgyturieowpqbnvmcxz6758493021`-=[]\\;',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|:\"<>?";
 data.consecutive = 5;
-data.word_length = 7;
+data.word_length = 8;
 data.current_layout = "qwerty";
 
 
@@ -26,7 +76,7 @@ $(document).ready(function() {
     $(document).keypress(keyHandler);
 });
 
-/* TODO */
+
 var start_time = 0;
 /* - viene chiamata in keyHandler, on keypress
    - div.stats
@@ -34,12 +84,12 @@ var start_time = 0;
 function start_stats() {
     /* 
       quando start_time è 0, assegna il tempo in sec
-      quando start_time è > 0, assegna
+      quando start_time è > 0, assegna il momento attuale
      */
     start_time = start_time || Math.floor(new Date().getTime() / 1000);
 }
 
-/* TODO */
+
 var hpm = 0; /* hits per minute */
 var ratio = 0;
 var hits_correct = 0;
@@ -53,6 +103,7 @@ function update_stats() {
     hpm = Math.floor((hits_correct + hits_wrong) / (current_time - start_time) * 60);
     /* 
       built-in function that "returns false if the argument is positive or negative Infinity or NaN or undefined; otherwise, true."
+      if total hits per minute is not a finite number, then set it to 0
      */
     if (!isFinite(hpm)) {
       hpm = 0;
@@ -75,19 +126,45 @@ function set_level(l) {
     render();
 }
 
+/*
+var data = {};
+data.chars = " jfkdlsahgyturieowpqbnvmcxz6758493021`-=[]\\;',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|:\"<>?";
+data.consecutive = 5;
+data.word_length = 7;
+data.current_layout = "qwerty";
+
+var layouts = {};
+layouts["qwerty"] = ...
+
+- takes l, layout
+- 
+ 
+ */
 function set_layout(l) {
-    data.current_layout = l
-	data.chars = layouts[l]
-    data.in_a_row = {};
-    for(var i = 0; i < data.chars.length; i++) {
-        data.in_a_row[data.chars[i]] = data.consecutive;
-    }
-    data.word_index = 0;
-    data.word_errors = {};
-    data.word = generate_word();
-    data.keys_hit = "";
-    save();
-    render();
+  /* sovrascrivo il default "qwerty" con l */
+  data.current_layout = l
+  /* set data.chars alla string a cui punta layouts[l]
+  quindi, se layouts[l] è "colemak", data.chars corrisponderà a " ntesiroahdjglpufywqbkvmcxz1234567890'\",.!?:;/@$%&#*()_ABCDEFGHIJKLMNOPQRSTUVWXYZ~+-={}|^<>`[]\\"
+   */
+  data.chars = layouts[l];
+  data.in_a_row = {};
+  /* 
+  {
+    " ": 5,
+    "n": 5,
+    "t": 5,
+    ...
+  }
+   */
+  for(var i = 0; i < data.chars.length; i++) {
+    data.in_a_row[data.chars[i]] = data.consecutive;
+  }
+  data.word_index = 0;
+  data.word_errors = {};
+  data.word = generate_word();
+  data.keys_hit = "";
+  save();
+  render();
 }
 
 function keyHandler(e) {
@@ -125,14 +202,14 @@ function keyHandler(e) {
 }
 
 function next_word(){
-	if(get_training_chars().length == 0) {
-		level_up();
-	}
-	data.word = generate_word();
-	data.word_index = 0;
-	data.keys_hit = "";
-	data.word_errors = {};
-	update_stats();
+  if(get_training_chars().length == 0) {
+    level_up();
+  }
+  data.word = generate_word();
+  data.word_index = 0;
+  data.keys_hit = "";
+  data.word_errors = {};
+  update_stats();
 
     render();
     save();
@@ -146,12 +223,18 @@ function level_up() {
     set_level(l);
 }
 
-/* TODO */
+/*
+  - helper to save data into localStorage.
+  - viene usato 4 volte
+*/
 function save() {
     localStorage.data = JSON.stringify(data);
 }
 
-/* TODO */
+/*
+  - retrieve data from localStorage
+  - usata 1 volta!
+*/
 function load() {
     data = JSON.parse(localStorage.data);
 }
@@ -290,37 +373,61 @@ function render_word() {
     $("#word").html(word + "<br>" + keys_hit);
 }
 
+/*
+  - take nothing
+  - return word
+*/
 function generate_word() {
-    word = '';
-    for(var i = 0; i < data.word_length; i++) {
-        c = choose(get_training_chars());
-        if(c != undefined && c != word[word.length-1]) {
-            word += c;
-        }
-        else {
-            word += choose(get_level_chars());
-        }
+  /* manca var, quindi word diventa global */
+  word = '';
+  for(var i = 0; i < data.word_length; i++) {
+    /*  
+    */
+    c = choose(get_training_chars());
+    if(c != undefined && c != word[word.length - 1]) {
+      word += c;
     }
-    return word;
+    else {
+      word += choose(get_level_chars());
+    }
+  }
+  return word;
 }
 
-/* TODO */
+/*
+if 
+  chars = " jfkdlsahgyturieowpqbnvmcxz6758493021`-=[]\\;',./ABCDEFGHIJKLMNOPQRSTUVWXYZ~!@#$%^&*()_+{}|:\"<>?";
+  level = "s"
+then
+  return ["j", "f", "k", "d", "l", "s"] 
+
+return the list of chars to train, according to choosen level
+*/
 function get_level_chars() {
-    return data.chars.slice(0, data.level + 1).split('');
+  return data.chars.slice(0, data.level + 1).split('');
 }
 
+/* TODO
+  - 
+ */
 function get_training_chars() {
-    var training_chars = [];
-    var level_chars = get_level_chars();
-    for(var x in level_chars) {
-        if (data.in_a_row[level_chars[x]] < data.consecutive) {
-            training_chars.push(level_chars[x]);
-        }
+  var training_chars = [];
+  var level_chars = get_level_chars();
+  for (var x in level_chars) {
+    if (data.in_a_row[level_chars[x]] < data.consecutive) {
+      training_chars.push(level_chars[x]);
     }
-    return training_chars;
+  }
+  return training_chars;
 }
 
-/* TODO */
+/*
+- guess: a is for array
+- Math.random() mi da un numero random tra 0 e 1
+- Math.random() * a.length mi da un numero random tra 0 e a.length
+- Math.floor(Math.random() * a.length) mi da un numero intero random tra 0 e a.length
+- return a random element of array a
+*/
 function choose(a) {
-    return a[Math.floor(Math.random() * a.length)];
+  return a[Math.floor(Math.random() * a.length)];
 }
